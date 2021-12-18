@@ -3,11 +3,11 @@ This is a FRONTEND web application that helps users visualize the Covid-19 prese
 The information is presented according to states and also aggregated Nation-wide.
 
 ## User Inerface Brief Description
-When the page loads a Google Maps interface will be created with markers set on each of the USA states with Covid Cases.
-The sidebar can be opened (or closed) by clicking on the Chevron icon to show more detailed information of the statistics.
-Clicking on a marker on the map, will update the sidebar with Covid statistics for the state selected.
-Using the autocomplete on the sidebar will also filter data for a specific state.
-When the filter is cleared the sidebar shows information.
+- When the page loads a Google Maps interface will be created with markers set on each of the USA states with Covid Cases.
+- The sidebar can be opened (or closed) by clicking on the Chevron icon to show more detailed information of the statistics.
+- Clicking on a marker on the map, will update the sidebar with Covid statistics for the state selected.
+- Using the autocomplete on the sidebar will also filter data for a specific state.
+- When the filter is cleared the sidebar shows information about the Nationwide USA Covid-19 statistics.
 # Brief Description of Tools used in this application
 ### 1. NextJS
 This is frontend ReactJS framework. The motivation behind using this was to fasten the development process as well as maintain application performance and scalability. It serves the application through a NodeJS server.
