@@ -134,9 +134,11 @@ export default function Home(props) {
                 if (lat_long.data.results.length) {
                     geometry = lat_long.data.results[0].locations[0].latLng
                 }
+                const cases_scale = state.cases / props.us_data.cases
                 return {
                     ...state,
-                    geometry: geometry
+                    geometry: geometry,
+                    cases_scale: cases_scale
                 }
             } catch (err) {
                 // if api for getode failed

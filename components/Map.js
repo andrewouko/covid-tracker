@@ -68,25 +68,33 @@ function Map(props) {
                 <>
                     { /* Child components, such as markers, info windows, etc. */}
                     {props.state_info && props.state_info.map((state, ix) => <>
+                        {/* {console.log('scale', state.cases_scale, (10 - (9 / (1 + state.cases_scale))) * 7)} */}
                         <Marker
                             key={ix}
                             position={state.geometry}
                             onClick={() => props.onMarkerClick(state)}
+                            icon={{
+                                path: google.maps.SymbolPath.CIRCLE,
+                                scale: (10 - (9 / (1 + state.cases_scale))) * 7,
+                                fillColor: 'red',
+                                fillOpacity: 0.45,
+                                strokeWeight: 1,
+                            }}
                         />
                         {state.show_info && <InfoWindow
                             position={state.geometry}
                         >
                             <div style={divStyle}>
-                            {/* <Typography variant="overline">
+                                {/* <Typography variant="overline">
                                     {state.state}
                                 </Typography> */}
                                 <List>
                                     {['active', 'recovered', 'deaths'].map((text, index) => (
-                                        <ListItem key={text} style={{padding: 0}} disablePadding disableGutters>
+                                        <ListItem key={text} style={{ padding: 0 }} disablePadding disableGutters>
                                             <ListItemIcon>
                                                 {getIcon(text, 17, 19)}
                                             </ListItemIcon>
-                                            <ListItemText className={classes.item}  secondary={text.toUpperCase()} primary={new Intl.NumberFormat().format(props.covid_info[text])} />
+                                            <ListItemText className={classes.item} secondary={text.toUpperCase()} primary={new Intl.NumberFormat().format(props.covid_info[text])} />
 
                                         </ListItem>
                                     ))}
