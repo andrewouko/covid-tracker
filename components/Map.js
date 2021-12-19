@@ -75,10 +75,10 @@ function Map(props) {
                             onClick={() => props.onMarkerClick(state)}
                             icon={{
                                 path: google.maps.SymbolPath.CIRCLE,
-                                scale: (10 - (9 / (1 + state.cases_scale))) * 7,
-                                fillColor: 'red',
+                                scale: (10 - (9 / (1 + state.cases_scale))) * 8,
+                                fillColor: 'orange',
                                 fillOpacity: 0.45,
-                                strokeWeight: 1,
+                                strokeWeight: 0.3,
                             }}
                         />
                         {state.show_info && <InfoWindow

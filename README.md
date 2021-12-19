@@ -8,6 +8,12 @@ The information is presented according to states and also aggregated Nation-wide
 - Clicking on a marker on the map, will update the sidebar with Covid statistics for the state selected.
 - Using the autocomplete on the sidebar will also filter data for a specific state.
 - When the filter is cleared the sidebar shows information about the Nationwide USA Covid-19 statistics.
+
+
+## Sample Application
+ A sample of the application is deployed at 
+
+
 # Brief Description of Tools used in this application
 ### 1. NextJS
 This is frontend ReactJS framework. The motivation behind using this was to fasten the development process as well as maintain application performance and scalability. It serves the application through a NodeJS server.
@@ -29,10 +35,10 @@ This API is used to get latitude and longitude information for a each state. Thi
 
 ### 1. Get the required API Keys
 #### a. Google MAPS
-Follow the guide on `https://developers.google.com/maps/documentation/maps-static/get-api-key` to get your Google MAPS API Key
+Follow the guide on `https://developers.google.com/maps/documentation/maps-static/get-api-key` to get your Google MAPS API Key. <b> The application is designed to work even if this key is missing. The constraint is that the map shown will be a low resolution map without much interactivity; it will also have a watermark labelled 'For Development Purposes Only'.</b>
 
 #### a. MapQuest GeoCodingAPI
-Setup a free account on `https://developer.mapquest.com/plan_purchase/steps/business_edition/business_edition_free/register`. After that, get the API key on `https://developer.mapquest.com/user/me/profile` after signing in.
+Setup a free account on `https://developer.mapquest.com/plan_purchase/steps/business_edition/business_edition_free/register`. After that, get the API key on `https://developer.mapquest.com/user/me/profile` after signing in. <b>A sample working key is included in the application for demo purposes.</b>
 
 ### 2. Install dependencies using npm
 
@@ -40,8 +46,10 @@ Setup a free account on `https://developer.mapquest.com/plan_purchase/steps/busi
 
 ### 3. Create .env.local file in `the project root folder` with following variables :
 
--   `NEXT_PUBLIC_GEO_CODE_KEY` : This is the API keys for using MapQuest GeoCoding API. The key is located at `https://developer.mapquest.com/user/me/profile` after signing up. It needs to be prefixed with NEXT_PUBLIC_ to be available of the frontend.
--   `NEXT_PUBLIC_GOOGLE_MAPS_KEY` : This is the API key for using the Maps for Javascript API & Services. It is located in the Credential section of the Google Developer Console. It needs to be prefixed with NEXT_PUBLIC_ to be available of the frontend.
+-   `NEXT_PUBLIC_GEO_CODE_KEY` : This is the API keys for using MapQuest GeoCoding API. The key is located at `https://developer.mapquest.com/user/me/profile` after signing up. It needs to be prefixed with NEXT_PUBLIC_ to be available of the frontend. A key is provided in the .env.sample file.
+-   `NEXT_PUBLIC_GOOGLE_MAPS_KEY` : This is the API key for using the Maps for Javascript API & Services. It is located in the Credential section of the Google Developer Console. It needs to be prefixed with NEXT_PUBLIC_ to be available of the frontend. The application is designed to work even if this is not set.
+
+*A sample is provided in the project root. labelled .env.sample*
 
 ### 4. Build the Application using the scripts provided in package.json
 `npm run build`
