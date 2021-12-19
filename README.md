@@ -11,7 +11,7 @@ The information is presented according to states and also aggregated Nation-wide
 
 
 ## Sample Application
- A sample of the application is deployed at 
+ A sample of the application is deployed at `https://gallant-ptolemy-426039.netlify.app`
 
 
 # Brief Description of Tools used in this application
