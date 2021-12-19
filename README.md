@@ -19,13 +19,10 @@ This is an open source React Component library that enables us to build a scalab
 ### 3. React Google Maps
 This is an npm package that wraps around the V3 of the Google Maps library. It abstracts most of the complexity of installing Google Maps on the frontend. You will still need to setup and API key and Billing information in the Google Console. `https://www.npmjs.com/package/react-google-maps`
 
-### 4. Recompose
-Recompose is a React utility belt for functional components and higher-order components. `https://www.npmjs.com/package/recompose`
-
-### 5. NovelCovid API
+### 4. NovelCovid API
 This API is used to get the latest Covid-19 statistics. Specifically, the application uses the /v2/states and /v2/countries/:query endpoints. The former returns the Covid-19 statisics for each USA state. The latter returns the aggregated Covid-19 for the entire USA. The documentation can be found at `https://documenter.getpostman.com/view/11144369/Szf6Z9B3?version=latest#deb6cab2-fe80-4532-be14-f7d86635078f`
 
-### 6. MapQuest GeoCodingAPI
+### 5. MapQuest GeoCodingAPI
 This API is used to get latitude and longitude information for a each state. This is important for rendering markers in the map correctly. `https://developer.mapquest.com/documentation/geocoding-api/address/get/`
 
 # How to start the application

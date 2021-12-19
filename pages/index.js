@@ -15,17 +15,13 @@ import ChevronRightIcon from '@mui/icons-material/ChevronRight';
 import ListItem from '@mui/material/ListItem';
 import ListItemIcon from '@mui/material/ListItemIcon';
 import ListItemText from '@mui/material/ListItemText';
-import InboxIcon from '@mui/icons-material/MoveToInbox';
-import MailIcon from '@mui/icons-material/Mail';
 import TipsAndUpdatesIcon from '@mui/icons-material/TipsAndUpdates';
 import { makeStyles } from '@mui/styles';
 import { Theme } from '@mui/material'
-import Avatar from '@mui/material/Avatar';
-import { purple, yellow, green, blue, orange } from '@mui/material/colors';
 import { Autocomplete, TextField, Stack, Chip } from '@mui/material';
-import { getStateData, getCountyData, getGeoCode, getCountryData } from '../lib/apis'
-import { compose, withProps } from "recompose"
-import { withScriptjs, withGoogleMap, GoogleMap, Marker } from "react-google-maps"
+import { getStateData, getGeoCode, getCountryData } from '../lib/apis'
+import Map from '../components/Map';
+import { getIcon } from '../lib/utils';
 
 const drawerWidth = 300;
 
@@ -96,27 +92,6 @@ const useStyles = makeStyles(() => ({
     }
 }));
 
-
-const CovidMap = compose(
-    withProps({
-        googleMapURL: "https://maps.googleapis.com/maps/api/js?v=3.exp&libraries=geometry,drawing,places",
-        loadingElement: <div style={{ height: `100%` }} />,
-        containerElement: <div style={{ height: `495px` }} />,
-        mapElement: <div style={{ height: `100%` }} />,
-    }),
-    withScriptjs,
-    withGoogleMap
-)((props) =>
-    <GoogleMap
-        defaultZoom={4}
-        defaultCenter={{lat: 39.099792, lng: -94.578559}}
-        mapType={"hybrid"}
-    >
-        {console.log('covid map', props)}
-        {props.state_info && props.state_info.map((state, ix) => <Marker key={ix} position={state.geometry} onClick={props.onMarkerClick} />)}
-    </GoogleMap>
-)
-
 export default function Home(props) {
     console.log(props)
     const theme = useTheme();
@@ -184,25 +159,6 @@ export default function Home(props) {
         setCovidInfo(props.us_data)
     }, [])
 
-
-    const getIcon = type => {
-        type = type.toLowerCase();
-        const size = { width: 28, height: 26 }
-        switch (type) {
-            case 'active':
-                return <Avatar sx={{ bgcolor: yellow[500], ...size }}>C</Avatar>
-            case 'deaths':
-                return <Avatar sx={{ bgcolor: purple[500], ...size }}>D</Avatar>
-            case 'recovered':
-                return <Avatar sx={{ bgcolor: green[500], ...size }}>R</Avatar>
-            case 'today\'s cases':
-                return <Avatar sx={{ bgcolor: orange[500], ...size }}>+</Avatar>
-            case 'tested':
-                return <Avatar sx={{ bgcolor: blue[500], ...size }}>T</Avatar>
-            default: return <Avatar sx={{ ...size }}>**</Avatar>
-        }
-    }
-
     const timeConverter = (UNIX_timestamp) => {
         var a = new Date(UNIX_timestamp * 1000);
         var months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
@@ -217,6 +173,7 @@ export default function Home(props) {
     }
 
     const handleValueChange = async (value) => {
+        if(!open) setOpen(true);
         setValue(value)
         if (value) {
             const current_state_info = state_info.filter(state => state.state === value)[0]
@@ -228,9 +185,16 @@ export default function Home(props) {
         }
     }
 
-    const handleMarkerClick = () => {
-         console.log('marker clicked')
-        setIsMarkerShown(false)
+    const handleMarkerClick = (state) => {
+        console.log('marker clicked', state)
+        handleValueChange(state.state)
+        let new_state_info = state_info
+        new_state_info = state_info.map(new_state => {
+            if(new_state.state === state.state) new_state.show_info = true
+            else new_state.show_info = false
+            return new_state
+        })
+        setStateInfo(new_state_info)
     };
 
     console.log(props, state_info)
@@ -329,9 +293,10 @@ export default function Home(props) {
             </Drawer>
             <Main open={open}>
                 <DrawerHeader />
-                <CovidMap
+                <Map
                     state_info={state_info}
                     onMarkerClick={handleMarkerClick}
+                    covid_info={covid_info}
                 />
             </Main>
         </Box>
