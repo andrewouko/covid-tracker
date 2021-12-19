@@ -182,6 +182,12 @@ export default function Home(props) {
         } else {
             setCovidInfo(props.us_data)
             setCountryTitle('')
+            let new_state_info = state_info
+            new_state_info = state_info.map(new_state => {
+                new_state.show_info = false
+                return new_state
+            })
+            setStateInfo(new_state_info)
         }
     }
 

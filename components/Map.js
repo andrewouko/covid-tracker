@@ -63,7 +63,7 @@ function Map(props) {
             <GoogleMap
                 mapContainerStyle={containerStyle}
                 center={center}
-                zoom={5}
+                zoom={4}
             >
                 <>
                     { /* Child components, such as markers, info windows, etc. */}
@@ -86,7 +86,7 @@ function Map(props) {
                                             <ListItemIcon>
                                                 {getIcon(text, 17, 19)}
                                             </ListItemIcon>
-                                            <ListItemText className={classes.item}  primary={text.toUpperCase()} secondary={new Intl.NumberFormat().format(props.covid_info[text])} />
+                                            <ListItemText className={classes.item}  secondary={text.toUpperCase()} primary={new Intl.NumberFormat().format(props.covid_info[text])} />
 
                                         </ListItem>
                                     ))}
