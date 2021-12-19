@@ -19,11 +19,13 @@ import TipsAndUpdatesIcon from '@mui/icons-material/TipsAndUpdates';
 import { makeStyles } from '@mui/styles';
 import { Theme } from '@mui/material'
 import { Autocomplete, TextField, Stack, Chip } from '@mui/material';
-import { getStateData, getGeoCode, getCountryData } from '../lib/apis'
+import { getStateData, getGeoCode, getCountryData, getGeoJson } from '../lib/apis'
 import Map from '../components/Map';
 import { getIcon } from '../lib/utils';
+import Loader from '../components/Loader'
 
 const drawerWidth = 300;
+const mobileDrawerWidth = 220;
 
 const Main = styled('main', { shouldForwardProp: (prop) => prop !== 'open' })(
     ({ theme, open }) => ({
@@ -102,6 +104,8 @@ export default function Home(props) {
     const [state_info, setStateInfo] = React.useState([])
     const [covid_info, setCovidInfo] = React.useState({})
     const [isMarkerShown, setIsMarkerShown] = React.useState(true)
+    const [isLoading, setIsLoading] = React.useState(false)
+    const [size, setSize] = React.useState(0);
 
     const handleDrawerOpen = () => {
         setOpen(true);
@@ -126,19 +130,29 @@ export default function Home(props) {
         getOptionLabel: (option) => option,
     };
 
+    function updateSize() {
+        setSize(window.screen.width)
+    }
+
     const loadGeometryData = async () => {
         let state_info = props.state_data.map(async (state) => {
             try {
                 const lat_long = await getGeoCode(state.state)
-                let geometry
+                let geo_json_coords
+                let geometry, code
                 if (lat_long.data.results.length) {
                     geometry = lat_long.data.results[0].locations[0].latLng
+                    code = lat_long.data.results[0].locations[0].adminArea3
+                    geo_json_coords = await getGeoJson(code)
+                    geo_json_coords = geo_json_coords.data.coordinates
                 }
                 const cases_scale = state.cases / props.us_data.cases
                 return {
                     ...state,
                     geometry: geometry,
-                    cases_scale: cases_scale
+                    cases_scale: cases_scale,
+                    code: code,
+                    geo_json_coords: geo_json_coords
                 }
             } catch (err) {
                 // if api for getode failed
@@ -151,14 +165,18 @@ export default function Home(props) {
         // filter all records without geometry state_data
         state_info = state_info.filter(state => state.geometry !== undefined)
         setStateInfo(state_info)
+        setIsLoading(false)
     }
 
     React.useEffect(() => {
         if (props.state_data.length) {
             // load geometry data async to avoid having page loading slowly
+            setIsLoading(true)
             loadGeometryData()
         }
         setCovidInfo(props.us_data)
+        updateSize(window.screen.width)
+        window.addEventListener('resize', updateSize);
     }, [])
 
     const timeConverter = (UNIX_timestamp) => {
@@ -175,7 +193,7 @@ export default function Home(props) {
     }
 
     const handleValueChange = async (value) => {
-        if(!open) setOpen(true);
+        if (!open) setOpen(true);
         setValue(value)
         if (value) {
             const current_state_info = state_info.filter(state => state.state === value)[0]
@@ -198,14 +216,86 @@ export default function Home(props) {
         handleValueChange(state.state)
         let new_state_info = state_info
         new_state_info = state_info.map(new_state => {
-            if(new_state.state === state.state) new_state.show_info = true
+            if (new_state.state === state.state) new_state.show_info = true
             else new_state.show_info = false
             return new_state
         })
         setStateInfo(new_state_info)
     };
 
-    console.log(props, state_info)
+    const drawer_content = <>
+        <DrawerHeader>
+            <Autocomplete
+                {...defaultProps}
+                id="select-on-focus"
+                selectOnFocus
+                fullWidth
+                renderInput={(params) => (
+                    <TextField {...params} label="Search by state" variant="standard" />
+                )}
+                value={value}
+                onChange={(event, value) => {
+                    handleValueChange(value)
+                }}
+            />
+            <IconButton style={{ marginLeft: theme.spacing(1) }} onClick={handleDrawerClose}>
+                {theme.direction === 'ltr' ? <ChevronLeftIcon /> : <ChevronRightIcon />}
+            </IconButton>
+        </DrawerHeader>
+        {value && <SidebarDiv>
+            <Stack direction="row" spacing={1}>
+                <Chip
+                    label={value}
+                    onClick={handleClick}
+                    onDelete={handleDelete}
+                    color="primary"
+                    variant="outlined"
+                />
+            </Stack>
+        </SidebarDiv>}
+        <SidebarDiv className={classes.active_title}>
+            <Typography variant="h6" gutterBottom component="div">
+                {`${country_title.length ? country_title : 'US'} Total Cases`}
+            </Typography>
+        </SidebarDiv>
+        <SidebarDiv className={classes.total_count}>
+            <Typography variant="h4" gutterBottom component="div">
+                {new Intl.NumberFormat().format(covid_info.cases)}
+            </Typography>
+        </SidebarDiv>
+
+        <SidebarDiv>
+            <TipsAndUpdatesIcon className={classes.info_icon} />
+            <Typography variant="caption" display="block" gutterBottom>
+                {`Last updated: ${timeConverter(covid_info.updated)}`}
+            </Typography>
+        </SidebarDiv>
+        <Divider />
+        <List>
+            {['tested', 'active', 'recovered', 'deaths', 'today\'s cases'].map((text, index) => (
+                <ListItem key={text}>
+                    <ListItemIcon>
+                        {getIcon(text)}
+                    </ListItemIcon>
+                    <ListItemText primary={text.toUpperCase()} secondary={new Intl.NumberFormat().format(covid_info[text])} />
+
+                </ListItem>
+            ))}
+        </List>
+        <Divider />
+    </>
+
+    const map = <Map
+        state_info={state_info}
+        onMarkerClick={handleMarkerClick}
+        covid_info={covid_info}
+        zoom={size <= 767 ? 3 : 4}
+    />
+
+    // const container = window !== undefined ? () => window().document.body : undefined;
+
+
+    console.log(props, state_info, size)
 
     return (
         <Box sx={{ display: 'flex' }}>
@@ -217,7 +307,7 @@ export default function Home(props) {
                         aria-label="open drawer"
                         onClick={handleDrawerOpen}
                         edge="start"
-                        sx={{ mr: 2, ...(open && { display: 'none' }) }}
+                        sx={size > 767 && { mr: 2, ...(open && { display: 'none' }) }}
                     >
                         <MenuIcon />
                     </IconButton>
@@ -226,7 +316,7 @@ export default function Home(props) {
                     </Typography>
                 </Toolbar>
             </AppBar>
-            <Drawer
+            {size > 767 && <Drawer
                 sx={{
                     width: drawerWidth,
                     flexShrink: 0,
@@ -239,74 +329,34 @@ export default function Home(props) {
                 anchor="left"
                 open={open}
             >
-                <DrawerHeader>
-                    <Autocomplete
-                        {...defaultProps}
-                        id="select-on-focus"
-                        selectOnFocus
-                        fullWidth
-                        renderInput={(params) => (
-                            <TextField {...params} label="Search by state" variant="standard" />
-                        )}
-                        value={value}
-                        onChange={(event, value) => {
-                            handleValueChange(value)
-                        }}
-                    />
-                    <IconButton style={{ marginLeft: theme.spacing(1) }} onClick={handleDrawerClose}>
-                        {theme.direction === 'ltr' ? <ChevronLeftIcon /> : <ChevronRightIcon />}
-                    </IconButton>
-                </DrawerHeader>
-                {value && <SidebarDiv>
-                    <Stack direction="row" spacing={1}>
-                        <Chip
-                            label={value}
-                            onClick={handleClick}
-                            onDelete={handleDelete}
-                            color="primary"
-                            variant="outlined"
-                        />
-                    </Stack>
-                </SidebarDiv>}
-                <SidebarDiv className={classes.active_title}>
-                    <Typography variant="h6" gutterBottom component="div">
-                        {`${country_title.length ? country_title : 'US'} Total Cases`}
-                    </Typography>
-                </SidebarDiv>
-                <SidebarDiv className={classes.total_count}>
-                    <Typography variant="h4" gutterBottom component="div">
-                        {new Intl.NumberFormat().format(covid_info.cases)}
-                    </Typography>
-                </SidebarDiv>
+                {drawer_content}
+            </Drawer>}
+            {size <= 767 &&<Drawer
+                // container={container}
+                variant="temporary"
+                open={open}
+                onClose={() => setOpen(false)}
+                ModalProps={{
+                    keepMounted: true, // Better open performance on mobile.
+                }}
+                sx={{
+                    // display: { xs: 'block', sm: 'none' },
+                    '& .MuiDrawer-paper': { boxSizing: 'border-box', width: mobileDrawerWidth },
+                }}
+            >
+                {drawer_content}
+            </Drawer>}
 
-                <SidebarDiv>
-                    <TipsAndUpdatesIcon className={classes.info_icon} />
-                    <Typography variant="caption" display="block" gutterBottom>
-                        {`Last updated: ${timeConverter(covid_info.updated)}`}
-                    </Typography>
-                </SidebarDiv>
-                <Divider />
-                <List>
-                    {['tested', 'active', 'recovered', 'deaths', 'today\'s cases'].map((text, index) => (
-                        <ListItem key={text}>
-                            <ListItemIcon>
-                                {getIcon(text)}
-                            </ListItemIcon>
-                            <ListItemText primary={text.toUpperCase()} secondary={new Intl.NumberFormat().format(covid_info[text])} />
-
-                        </ListItem>
-                    ))}
-                </List>
-                <Divider />
-            </Drawer>
-            <Main open={open}>
+            {/** Render map based on screen width */}
+            {size > 767 ? <Main open={open}>
                 <DrawerHeader />
-                <Map
-                    state_info={state_info}
-                    onMarkerClick={handleMarkerClick}
-                    covid_info={covid_info}
-                />
-            </Main>
+                {isLoading && <Loader />}
+                {map}
+            </Main> : <div style={{ width: `100%` }}>
+                <DrawerHeader />
+                {isLoading && <Loader />}
+                {map}
+            </div>}
         </Box>
     );
 }

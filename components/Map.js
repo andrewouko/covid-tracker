@@ -63,7 +63,7 @@ function Map(props) {
             <GoogleMap
                 mapContainerStyle={containerStyle}
                 center={center}
-                zoom={4}
+                zoom={props.zoom || 4}
             >
                 <>
                     { /* Child components, such as markers, info windows, etc. */}
@@ -83,6 +83,7 @@ function Map(props) {
                         />
                         {state.show_info && <InfoWindow
                             position={state.geometry}
+                            key={ix}
                         >
                             <div style={divStyle}>
                                 {/* <Typography variant="overline">
@@ -90,7 +91,7 @@ function Map(props) {
                                 </Typography> */}
                                 <List>
                                     {['active', 'recovered', 'deaths'].map((text, index) => (
-                                        <ListItem key={text} style={{ padding: 0 }} disablePadding disableGutters>
+                                        <ListItem key={index} style={{ padding: 0 }} disablePadding disableGutters>
                                             <ListItemIcon>
                                                 {getIcon(text, 17, 19)}
                                             </ListItemIcon>
@@ -101,6 +102,18 @@ function Map(props) {
                                 </List>
                             </div>
                         </InfoWindow>}
+                        {<Polygon
+                            path={state.geo_json_coords}
+                            editable={true}
+                            options={{
+                                strokeColor: "#FF0000",
+                                strokeOpacity: 0.8,
+                                strokeWeight: 2,
+                                fillColor: "#FF0000",
+                                fillOpacity: 0.35,
+                                polygonKey: 1
+                            }}
+                        />}
                     </>)}
                     {/* <Polygon
                         paths={paths}

@@ -31,6 +31,9 @@ This API is used to get the latest Covid-19 statistics. Specifically, the applic
 ### 5. MapQuest GeoCodingAPI
 This API is used to get latitude and longitude information for a each state. This is important for rendering markers in the map correctly. `https://developer.mapquest.com/documentation/geocoding-api/address/get/`
 
+### 5. GeoJSON Shape Files
+The project uses the shapes provided by this API to render polygons for the US Districts within the states. `https://github.com/unitedstates/districts`
+
 # How to start the application
 
 ### 1. Get the required API Keys
@@ -76,3 +79,10 @@ The MapQuest GeoCoding API has been noted to be unstable. It responds with `net:
 
 ### 3. Deprecated ReactJS features in react-google-maps package
 The react-google-maps package uses some outdated features in it's code. This will lead to some warnings when building the applciation and starting the server. Nevertheless the application will continue to function as the features used are not breaking changes.
+
+
+### 4. Lack of testing
+Due to the time constraints the project does not have any end to end testing. With more time it would have ideal to implement Cypress for end to end testing.
+
+### 5. GeoJSON is not implemented
+The project implements GeoJSON but it fails to render the polygons correctly when the google maps API is not provided correctly.
