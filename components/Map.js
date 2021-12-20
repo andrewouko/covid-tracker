@@ -88,20 +88,33 @@ function Map(props) {
                             key={ix}
                         >
                             <div style={divStyle}>
-                                <Typography variant="overline">
+                                <b>
                                     {state.state}
-                                </Typography>
-                                <List>
+                                </b>
+                                <ul style={{margin: 0, padding: 0, fontSize: `10px`}}>
+                                    {['active', 'recovered', 'deaths'].map((text, index) => {
+                                        let color
+                                        switch(text){
+                                            case 'active': color = '#b2a300'; break
+                                            case 'recovered': color = 'green'; break
+                                            case 'deaths': color = 'purple'; break
+                                        }
+                                        return (<li>
+                                            <b style={{color: color}}>{`${text.toUpperCase()}`}</b> : {new Intl.NumberFormat().format(props.covid_info[text])}
+                                        </li> )
+                                    })}
+                                </ul>
+                                {/* <List>
                                     {['active', 'recovered', 'deaths'].map((text, index) => (
-                                        <ListItem key={index} style={{ padding: 0 }} disablePadding disableGutters>
+                                        <ListItem key={index} style={{ padding: 0 }} disablePadding disableGutters> */}
                                             {/* <ListItemIcon>
                                                 {getIcon(text, 17, 19)}
                                             </ListItemIcon> */}
-                                            <ListItemText className={classes.item} secondary={text.toUpperCase()} primary={new Intl.NumberFormat().format(props.covid_info[text])} />
+                                            {/* <ListItemText className={classes.item} secondary={text.toUpperCase()} primary={new Intl.NumberFormat().format(props.covid_info[text])} />
 
                                         </ListItem>
                                     ))}
-                                </List>
+                                </List> */}
                             </div>
                         </InfoWindow>}
                         {<Polygon
