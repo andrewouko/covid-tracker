@@ -43,7 +43,9 @@ const useStyles = makeStyles({
         '& span, & svg, & p': {
             fontSize: '0.5rem'
         }
-    }
+    },
+    padding: 0,
+    margin: 0
 });
 
 
@@ -86,15 +88,15 @@ function Map(props) {
                             key={ix}
                         >
                             <div style={divStyle}>
-                                {/* <Typography variant="overline">
+                                <Typography variant="overline">
                                     {state.state}
-                                </Typography> */}
+                                </Typography>
                                 <List>
                                     {['active', 'recovered', 'deaths'].map((text, index) => (
                                         <ListItem key={index} style={{ padding: 0 }} disablePadding disableGutters>
-                                            <ListItemIcon>
+                                            {/* <ListItemIcon>
                                                 {getIcon(text, 17, 19)}
-                                            </ListItemIcon>
+                                            </ListItemIcon> */}
                                             <ListItemText className={classes.item} secondary={text.toUpperCase()} primary={new Intl.NumberFormat().format(props.covid_info[text])} />
 
                                         </ListItem>
