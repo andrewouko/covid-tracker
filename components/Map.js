@@ -99,7 +99,7 @@ function Map(props) {
                                             case 'recovered': color = 'green'; break
                                             case 'deaths': color = 'purple'; break
                                         }
-                                        return (<li>
+                                        return (<li key={index}>
                                             <b style={{color: color}}>{`${text.toUpperCase()}`}</b> : {new Intl.NumberFormat().format(props.covid_info[text])}
                                         </li> )
                                     })}
