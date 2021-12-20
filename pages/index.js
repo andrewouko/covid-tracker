@@ -54,8 +54,8 @@ const AppBar = styled(MuiAppBar, {
         duration: theme.transitions.duration.leavingScreen,
     }),
     ...(open && {
-        width: `calc(100% - ${drawerWidth}px)`,
-        marginLeft: `${drawerWidth}px`,
+        width: `calc(100% - ${window.screen.width > 767 ? drawerWidth : mobileDrawerWidth}px)`,
+        marginLeft: `${window.screen.width > 767 ? drawerWidth : mobileDrawerWidth}px`,
         transition: theme.transitions.create(['margin', 'width'], {
             easing: theme.transitions.easing.easeOut,
             duration: theme.transitions.duration.enteringScreen,
@@ -307,7 +307,7 @@ export default function Home(props) {
                         aria-label="open drawer"
                         onClick={handleDrawerOpen}
                         edge="start"
-                        sx={size > 767 && { mr: 2, ...(open && { display: 'none' }) }}
+                        sx={size > 767 && { mr: 2, ...(open && { display: 'none' }) } }
                     >
                         <MenuIcon />
                     </IconButton>
