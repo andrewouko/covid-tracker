@@ -193,7 +193,7 @@ export default function Home(props) {
     }
 
     const handleValueChange = async (value) => {
-        if (!open) setOpen(true);
+        if (!open && size <= 767) setOpen(true);
         setValue(value)
         if (value) {
             const current_state_info = state_info.filter(state => state.state === value)[0]
