@@ -1,92 +1,28 @@
 import * as React from 'react';
 import { styled, useTheme } from '@mui/material/styles';
 import Box from '@mui/material/Box';
-import Drawer from '@mui/material/Drawer';
+
 import CssBaseline from '@mui/material/CssBaseline';
-import MuiAppBar from '@mui/material/AppBar';
-import Toolbar from '@mui/material/Toolbar';
-import List from '@mui/material/List';
-import Typography from '@mui/material/Typography';
-import Divider from '@mui/material/Divider';
-import IconButton from '@mui/material/IconButton';
-import MenuIcon from '@mui/icons-material/Menu';
-import ChevronLeftIcon from '@mui/icons-material/ChevronLeft';
-import ChevronRightIcon from '@mui/icons-material/ChevronRight';
-import ListItem from '@mui/material/ListItem';
-import ListItemIcon from '@mui/material/ListItemIcon';
-import ListItemText from '@mui/material/ListItemText';
-import TipsAndUpdatesIcon from '@mui/icons-material/TipsAndUpdates';
+
 import { makeStyles } from '@mui/styles';
 import { Theme } from '@mui/material'
 import { Autocomplete, TextField, Stack, Chip } from '@mui/material';
 import { getStateData, getGeoCode, getCountryData, getGeoJson } from '../lib/apis'
-import Map from '../components/Map';
 import { getIcon } from '../lib/utils';
-import Loader from '../components/Loader'
 
-const drawerWidth = 300;
-const mobileDrawerWidth = 220;
+import DetailsDrawer from '../components/DetailsDrawer'
 
-const Main = styled('main', { shouldForwardProp: (prop) => prop !== 'open' })(
-    ({ theme, open }) => ({
-        flexGrow: 1,
-        padding: theme.spacing(3),
-        transition: theme.transitions.create('margin', {
-            easing: theme.transitions.easing.sharp,
-            duration: theme.transitions.duration.leavingScreen,
-        }),
-        marginLeft: `-${drawerWidth}px`,
-        ...(open && {
-            transition: theme.transitions.create('margin', {
-                easing: theme.transitions.easing.easeOut,
-                duration: theme.transitions.duration.enteringScreen,
-            }),
-            marginLeft: 0,
-        }),
-    }),
-);
+import AppBar from '../components/AppBar'
 
-const AppBar = styled(MuiAppBar, {
-    shouldForwardProp: (prop) => prop !== 'open',
-})(({ theme, open }) => ({
-    transition: theme.transitions.create(['margin', 'width'], {
-        easing: theme.transitions.easing.sharp,
-        duration: theme.transitions.duration.leavingScreen,
-    }),
-    ...(open && {
-        width: `calc(100% - ${window.screen.width > 767 ? drawerWidth : mobileDrawerWidth}px)`,
-        marginLeft: `${window.screen.width > 767 ? drawerWidth : mobileDrawerWidth}px`,
-        transition: theme.transitions.create(['margin', 'width'], {
-            easing: theme.transitions.easing.easeOut,
-            duration: theme.transitions.duration.enteringScreen,
-        }),
-    }),
-}));
-
-const DrawerHeader = styled('div')(({ theme }) => ({
-    display: 'flex',
-    alignItems: 'center',
-    padding: theme.spacing(0, 1),
-    // necessary for content to be below app bar
-    ...theme.mixins.toolbar,
-    justifyContent: 'space-between',
-}));
-
-const SidebarDiv = styled('div')(({ theme }) => ({
-    display: 'flex',
-    // alignItems: 'center',
-    padding: theme.spacing(0, 0, 1, 1),
-}));
+import Main from '../components/content/Main'
 
 const useStyles = makeStyles(() => ({
     title: {
-        // marginBottom: `-16px`
     },
     info_icon: {
         marginRight: `8px`
     },
     total_count: {
-        // marginTop: `8px`,
         paddingBottom: `0px`
     },
     active_title: {
@@ -98,14 +34,14 @@ export default function Home(props) {
     console.log(props)
     const theme = useTheme();
     const [open, setOpen] = React.useState(false);
-    const [header_text, setHeaderText] = React.useState('Covid Tracker')
+    
     const [country_title, setCountryTitle] = React.useState('')
     const [value, setValue] = React.useState(null);
     const [state_info, setStateInfo] = React.useState([])
     const [covid_info, setCovidInfo] = React.useState({})
     const [isMarkerShown, setIsMarkerShown] = React.useState(true)
     const [isLoading, setIsLoading] = React.useState(false)
-    const [size, setSize] = React.useState(0);
+    const [window_size, setWindowSize] = React.useState(0);
 
     const handleDrawerOpen = () => {
         setOpen(true);
@@ -125,13 +61,8 @@ export default function Home(props) {
 
     const classes = useStyles();
 
-    const defaultProps = {
-        options: state_info.length ? state_info.map(state => state.state) : [],
-        getOptionLabel: (option) => option,
-    };
-
     function updateSize() {
-        setSize(window.screen.width)
+        setWindowSize(window.screen.width)
     }
 
     const loadGeometryData = async () => {
@@ -157,7 +88,7 @@ export default function Home(props) {
             } catch (err) {
                 // if api for getode failed
                 // don't update the geometry data
-                console.log('fialed to get', err)
+                console.log('failed to get geometry data', err)
                 return { ...state }
             }
         })
@@ -179,21 +110,8 @@ export default function Home(props) {
         window.addEventListener('resize', updateSize);
     }, [])
 
-    const timeConverter = (UNIX_timestamp) => {
-        var a = new Date(UNIX_timestamp * 1000);
-        var months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
-        var year = /* a.getFullYear(); */ 2021
-        var month = months[a.getMonth()];
-        var date = a.getDate();
-        var hour = a.getHours();
-        var min = a.getMinutes();
-        var sec = a.getSeconds();
-        var time = date + ' ' + month + ' ' + year + ' ' + hour + ':' + min + ':' + sec;
-        return time;
-    }
-
     const handleValueChange = async (value) => {
-        if (!open && size <= 767) setOpen(true);
+        if (!open && window_size <= 767) setOpen(true);
         setValue(value)
         if (value) {
             const current_state_info = state_info.filter(state => state.state === value)[0]
@@ -211,6 +129,8 @@ export default function Home(props) {
         }
     }
 
+    
+
     const handleMarkerClick = (state) => {
         console.log('marker clicked', state)
         handleValueChange(state.state)
@@ -223,140 +143,18 @@ export default function Home(props) {
         setStateInfo(new_state_info)
     };
 
-    const drawer_content = <>
-        <DrawerHeader>
-            <Autocomplete
-                {...defaultProps}
-                id="select-on-focus"
-                selectOnFocus
-                fullWidth
-                renderInput={(params) => (
-                    <TextField {...params} label="Search by state" variant="standard" />
-                )}
-                value={value}
-                onChange={(event, value) => {
-                    handleValueChange(value)
-                }}
-            />
-            <IconButton style={{ marginLeft: theme.spacing(1) }} onClick={handleDrawerClose}>
-                {theme.direction === 'ltr' ? <ChevronLeftIcon /> : <ChevronRightIcon />}
-            </IconButton>
-        </DrawerHeader>
-        {value && <SidebarDiv>
-            <Stack direction="row" spacing={1}>
-                <Chip
-                    label={value}
-                    onClick={handleClick}
-                    onDelete={handleDelete}
-                    color="primary"
-                    variant="outlined"
-                />
-            </Stack>
-        </SidebarDiv>}
-        <SidebarDiv className={classes.active_title}>
-            <Typography variant="h6" gutterBottom component="div">
-                {`${country_title.length ? country_title : 'US'} Total Cases`}
-            </Typography>
-        </SidebarDiv>
-        <SidebarDiv className={classes.total_count}>
-            <Typography variant="h4" gutterBottom component="div">
-                {new Intl.NumberFormat().format(covid_info.cases)}
-            </Typography>
-        </SidebarDiv>
 
-        <SidebarDiv>
-            <TipsAndUpdatesIcon className={classes.info_icon} />
-            <Typography variant="caption" display="block" gutterBottom>
-                {`Last updated: ${timeConverter(covid_info.updated)}`}
-            </Typography>
-        </SidebarDiv>
-        <Divider />
-        <List>
-            {['tested', 'active', 'recovered', 'deaths', 'today\'s cases'].map((text, index) => (
-                <ListItem key={text}>
-                    <ListItemIcon>
-                        {getIcon(text)}
-                    </ListItemIcon>
-                    <ListItemText primary={text.toUpperCase()} secondary={new Intl.NumberFormat().format(covid_info[text])} />
-
-                </ListItem>
-            ))}
-        </List>
-        <Divider />
-    </>
-
-    const map = <Map
-        state_info={state_info}
-        onMarkerClick={handleMarkerClick}
-        covid_info={covid_info}
-        zoom={size <= 767 ? 3 : 4}
-    />
-
-    // const container = window !== undefined ? () => window().document.body : undefined;
-
-
-    console.log(props, state_info, size)
+    console.log(props, state_info, window_size)
 
     return (
         <Box sx={{ display: 'flex' }}>
             <CssBaseline />
-            <AppBar position="fixed" open={open}>
-                <Toolbar>
-                    <IconButton
-                        color="inherit"
-                        aria-label="open drawer"
-                        onClick={handleDrawerOpen}
-                        edge="start"
-                        sx={size > 767 && { mr: 2, ...(open && { display: 'none' }) } }
-                    >
-                        <MenuIcon />
-                    </IconButton>
-                    <Typography variant="h6" noWrap component="div">
-                        {header_text}
-                    </Typography>
-                </Toolbar>
-            </AppBar>
-            {size > 767 && <Drawer
-                sx={{
-                    width: drawerWidth,
-                    flexShrink: 0,
-                    '& .MuiDrawer-paper': {
-                        width: drawerWidth,
-                        boxSizing: 'border-box',
-                    },
-                }}
-                variant="persistent"
-                anchor="left"
-                open={open}
-            >
-                {drawer_content}
-            </Drawer>}
-            {size <= 767 &&<Drawer
-                // container={container}
-                variant="temporary"
-                open={open}
-                onClose={() => setOpen(false)}
-                ModalProps={{
-                    keepMounted: true, // Better open performance on mobile.
-                }}
-                sx={{
-                    // display: { xs: 'block', sm: 'none' },
-                    '& .MuiDrawer-paper': { boxSizing: 'border-box', width: mobileDrawerWidth },
-                }}
-            >
-                {drawer_content}
-            </Drawer>}
 
-            {/** Render map based on screen width */}
-            {size > 767 ? <Main open={open}>
-                <DrawerHeader />
-                {isLoading && <Loader />}
-                {map}
-            </Main> : <div style={{ width: `100%` }}>
-                <DrawerHeader />
-                {isLoading && <Loader />}
-                {map}
-            </div>}
+            <AppBar {...{ handleDrawerOpen, window_size, open }}    />
+
+            <DetailsDrawer {...{ handleDrawerClose, open, value, handleClick, handleDelete, country_title, covid_info, state_info, handleValueChange }}  />
+
+            <Main {...{ handleMarkerClick, covid_info, state_info, window_size, isLoading, open }} />
         </Box>
     );
 }

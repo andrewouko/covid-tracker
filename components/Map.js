@@ -58,6 +58,8 @@ function Map(props) {
         { lat: 32.321, lng: -64.757 },
         { lat: 25.774, lng: -80.19 }
     ]
+
+
     return (
         <LoadScript
             googleMapsApiKey={process.env.NEXT_PUBLIC_GOOGLE_MAPS_KEY}
@@ -70,7 +72,6 @@ function Map(props) {
                 <>
                     { /* Child components, such as markers, info windows, etc. */}
                     {props.state_info && props.state_info.map((state, ix) => <>
-                        {/* {console.log('scale', state.cases_scale, (10 - (9 / (1 + state.cases_scale))) * 7)} */}
                         <Marker
                             key={ix}
                             position={state.geometry}
@@ -104,17 +105,6 @@ function Map(props) {
                                         </li> )
                                     })}
                                 </ul>
-                                {/* <List>
-                                    {['active', 'recovered', 'deaths'].map((text, index) => (
-                                        <ListItem key={index} style={{ padding: 0 }} disablePadding disableGutters> */}
-                                            {/* <ListItemIcon>
-                                                {getIcon(text, 17, 19)}
-                                            </ListItemIcon> */}
-                                            {/* <ListItemText className={classes.item} secondary={text.toUpperCase()} primary={new Intl.NumberFormat().format(props.covid_info[text])} />
-
-                                        </ListItem>
-                                    ))}
-                                </List> */}
                             </div>
                         </InfoWindow>}
                         {<Polygon
@@ -130,10 +120,6 @@ function Map(props) {
                             }}
                         />}
                     </>)}
-                    {/* <Polygon
-                        paths={paths}
-                        options={options}
-                    /> */}
                 </>
             </GoogleMap>
         </LoadScript>
